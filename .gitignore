@@ -1,0 +1,7 @@
+# vim tmp files
+*~
+*.swp
+*.swo
+
+# pycache
+__pycache__/*

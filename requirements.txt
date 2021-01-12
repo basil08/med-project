@@ -1,0 +1,11 @@
+; not included
+ascii_graph
+simple_console_menu
+mysql.connector
+
+; included
+time
+datetime
+pickle
+csv
+smtplib
