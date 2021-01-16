@@ -6,7 +6,6 @@ import time
 # TODO: Use environment variable to store passwd ffs 
 #
 
-
 def init_db(host='localhost', user='Basil', passwd='2a19i12',db='med1'):
     try:
         mycon = mc.connect(host=host, user=user, password=passwd, database=db)
@@ -18,13 +17,57 @@ def init_db(host='localhost', user='Basil', passwd='2a19i12',db='med1'):
 
 def desc_tbl(tbl_name):
     cursor.execute('describe {0}'.format(tbl_name))
-    
-    schema = cursor.fetchall()
-   
-    print([x for (x,_, _, _, _, _) in schema])
+    return cursor.fetchall()
     # schema is a list on n tuples with n field names and meta
     # so get just the first of those (the name)
 
+def snip(string, char=2):
+    return string[:len(string)-char]
+
+def insert_record(tbl, data):
+    """ Insert a PythonDict object ('data') into the tbl table
+    
+    data is a dictionary of user_info records. Think MongoDB in MySQL.
+
+    NOTE: keys and values of the dict MUST be string.
+    
+    FUTURE TODO: allow lists as values and 'flatten' it into a string
+
+    returns: bool (True if successfull insertion, false otherwise)
+    """
+    try:
+        lst = {}          # just a cheap hack and DONT be misled, its a dict inspite of its name
+        # lst is basically a flag dictionary
+        # it flags those fields which have 'varchar' in their definition (extracted by the typeof())
+        # then if flag is 1 meaning the field in question is a varchar, enclose it in ""
+        # else don't enclose in quotes
+        mutation = 'insert into {} ('.format(tbl)
+        for k in data.keys():  
+            mutation += (k+', ')
+            if 'varchar' in typeof(tbl, k): lst[str(k)] = 1
+            else: lst[k] = 0
+        mutation = snip(mutation)
+        mutation += ') values ('
+        for k, v in data.items():
+            if lst[k] == 1: mutation += ('"' + v + '" ,') 
+            else: mutation += (v + ', ')
+        mutation = snip(mutation)
+        mutation += ' );'
+        print('DEBUG final insert record string: ',mutation)
+        cursor.execute(mutation)
+        mycon.commit()
+        return True
+    except:
+        print('[-] Error: Unable to add new entry to database.')
+        return False
+    
+
+def typeof(tbl, field):
+    schema = desc_tbl(tbl)
+    for tpl in schema: 
+        if tpl[0] == field: return str(tpl[1])
+    return None
+    
 def schema(tbl_name):
     """ Returns a list of all the fieldnames in the table
     """
@@ -89,6 +132,7 @@ def listify(data):
         lst.append(rcd_lst)
     return lst
 
+# Deprecated. It's a function I am ashamed to have written in the first place. Don't use it!
 def init_new_user_tbl(record):
     """ Make a new table in default database with the schema same for each patient and having tblname same as record['uname']
     returns: bool
@@ -103,7 +147,11 @@ def init_new_user_tbl(record):
     except:
         print('Fatal Error: Could not create new table')
 
-def insert_one_user(tbl, data):
+def snip(string, char=2):
+    return string[:len(string)-char]
+
+
+def insert_record(tbl, data):
     """ Insert a PythonDict object ('data') into the tbl table
     
     data is a dictionary of user_info records. Think MongoDB in MySQL.
@@ -111,9 +159,18 @@ def insert_one_user(tbl, data):
     returns: bool (True if successfull insertion, false otherwise)
     """
     try:
-        mutation = 'insert into {0} values ("{1}","{2}","{3}","{4}",{5});'.format(tbl, data['lname'], data['fname'], data['uname'], data['passwd'], data['id'])
-#        print('DEBUG:',mutation)
-
+        mutation = 'insert into {} ('.format(tbl)
+        for k in data.keys():  
+            mutation += (k+', ')
+        print('before snip', mutation)
+        mutation = snip(mutation)
+        print('after snip', mutation)
+        mutation += ') values ('
+        for v in data.values():
+            mutation += (v + ', ')
+        mutation = snip(mutation)
+        mutation += ' );'
+        print('DEBUG final insert record string: ',mutation)
         cursor.execute(mutation)
         mycon.commit()
         return True
@@ -137,7 +194,7 @@ def insert_user_data(record, mutation):
 
 #
 # This thing is not working properly
-def get_record(tbl, fieldname, val):
+def get_records(tbl, fieldname, val):
     """ Returns a Python DictObject with the record having fieldname = val
     
     returns: a list of _all_ matched records
@@ -149,7 +206,7 @@ def get_record(tbl, fieldname, val):
     return data
 
 # And this thing also...
-def get_record_one(tbl, fieldname, val):
+def get_record(tbl, fieldname, val):
     """ Returns a DictObject with the record hacing fieldname = val
 
     returns: the first match, in case of multiple matched records, this is equivalent to get_records()[0]

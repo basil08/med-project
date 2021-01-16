@@ -1,20 +1,109 @@
 # builtins
 import math
 import time
+import getpass
+import random
+import sys
 
 # installed
 from consolemenu import *
 from consolemenu.items import *
 
 # my modules
-import login
+# import login
 import view
+import util
+import db
+
+# should ideally load from an environment variable 
+# but ok for now
+USER_INFO_TBL = 'user_info'
+
+def unauthorized_access():
+    print('Unauthorized access: Incorrect Password')
+    print('*'*20,' ABORT ','*'*20)
+
+def new_signup():
+    fname = input('Enter your first name: ').strip()
+    lname = input('Enter your last name: ').strip()
+    uname = input('Enter your username: ').strip()
+    
+    # ensure unique username
+    while db.has(USER_INFO_TBL,'uname',uname):
+        print('[-] Username taken: Try Again')
+        uname = input('Enter your username: ')
+
+    password = getpass.getpass(prompt='Create a strong password: ')
+    retype_password = getpass.getpass(prompt='Retype password: ')
+    
+    if password != retype_password:
+        print('Passwords do not match\nAbort')
+        sys.exit()
+    
+
+    new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': random.randint(1,100000)} # TODO: can clash, future ver should ensure it is TRULY unique
+
+    if db.insert_record(USER_INFO_TBL, new_user):
+        print(fname, lname, 'has been successfully added to the database')
+    else:
+        print('\nPLEASE TRY AGAIN')
+    login()
+
+
+def signup():
+    util.cls()
+    print('-----------')
+    
+    #
+    # USE MENU HERE IN LINUX PLATFORMS
+    #
+    print('You did not enter a username and password during login\nDo you want to create an account?(y/N)')
+    
+    print('------------')
+    ch = input()
+    if ch in ['No','n','N','no']:
+        print('Abort')
+    elif ch in ['y','Y','yes','Yes']:
+        new_signup()
+
+
+
+def login():
+    try:
+        # clear current buffer
+        util.cls()
+        print("=========================")
+        print("Welcome to user authentication portal")
+        print("=========================")
+        name = input('Username> ').strip()
+        password = getpass.getpass(prompt='Password ??? ')
+        
+        if db.has(USER_INFO_TBL,'uname',name):
+            # check for pass
+#            print('DEBUG: from user',password)
+#            print('DEBUG: db',db.getPassword(USER_INFO_TBL, name))
+            if not password == db.get_password(USER_INFO_TBL, name):
+                unauthorized_access()
+                sys.exit()
+            else:
+
+                print('Success: Authorization successful')
+                return db.get_record(USER_INFO_TBL,'uname',name)
+        else:
+            print('Error: {0} does not exist in the database.'.format(name))
+            print('Aborting login....')
+        
+        if name == '' and password == '':
+            signup()
+    except:
+        pass            # for now
+
 
 def show_submenu(menu):
     menu.show()
 
 def initialize():
-    rcd = login.login()
+    rcd = login()
     if rcd == None: # shouldn't be needed, but a security check
         pass
     else:
