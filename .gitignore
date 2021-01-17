@@ -6,6 +6,10 @@
 # dont track .files
 .*
 
+# no csv or dat files
+*.csv
+*.dat
+
 # pycache
 __pycache__/*
 

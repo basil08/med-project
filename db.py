@@ -100,7 +100,7 @@ def exists(tbl_name):
         cursor.execute('desc {}'.format(tbl_name))
         data = cursor.fetchall()
         return True
-    except mc.errors.DatabaseError as err:
+    except mc.errors.DatabaseError:
         return False
 
 def has(tbl, fieldname, val):

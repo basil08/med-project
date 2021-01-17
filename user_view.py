@@ -61,20 +61,33 @@ def export_to_bin(record):
     returns: nothing
     reports succss/failure to stdout
     """
-    datfilename = record['fname']+'_'+record['lname']+'.dat'
-    datfile = open(datfilename, 'wb')
+    try:
+        # write the headers
+        # the username is the name of the table
+        if not db.exists(record['uname']):
+            raise NoSuchTableError()
+    except NoSuchTableError:
+        print("Error: No table for {} exists in database.".format(
+            record['fname']))
+        print("Creating new table for {}".format(record['fname']))
+        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',\
+                                      'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
+        print("Created new table for {}".format(record['uname']))
+    finally:
+        datfilename = record['fname']+'_'+record['lname']+'.dat'
+        datfile = open(datfilename, 'wb')
 
-    # seggragate the table name and dump schema headers into dat file
-    tbl = record['uname'].strip()
-    headers = db.schema(tbl)
-    pickle.dump(headers, datfile)
+        # seggragate the table name and dump schema headers into dat file
+        tbl = record['uname'].strip()
+        headers = db.schema(tbl)
+        pickle.dump(headers, datfile)
 
-    data = db.listify(db.get_all_raw(tbl))
-    pickle.dump(data, datfile)
+        data = db.listify(db.get_all_raw(tbl))
+        pickle.dump(data, datfile)
 
-    print('Success: Data written to {0}'.format(datfilename))
-    input('Press Enter Key to Continue.........')
-    datfile.close()
+        print('Success: Data written to {0}'.format(datfilename))
+        datfile.close()
+        input('Press Enter Key to Continue.........')
 
 
 def basic_info(record):
@@ -101,16 +114,27 @@ def body_data(record):
     that table is read entirely.
     returns: nothing
     """
-    print('-'*50)
-    print("DATA REPOSITORY FOR", record['fname'], record['lname'])
-    print('-'*50)
-
-    tbl = record['uname'].strip()
-
-    # TODO: what if uname does not exist?
-    data = db.listify(db.get_all_raw(tbl))
-    print(tabulate.tabulate(data, headers=db.schema(tbl), tablefmt="pretty"))
-    input("Press Return Key to Continue......")
+    try:
+        # write the headers
+        # the username is the name of the table
+        if not db.exists(record['uname']):
+            raise NoSuchTableError()
+    except NoSuchTableError:
+        print("Error: No table for {} exists in database.".format(
+            record['fname']))
+        print("Creating new table for {}".format(record['fname']))
+        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',\
+                                      'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
+        print("Created new table for {}".format(record['uname']))
+    finally:
+        print('-'*50)
+        print("DATA REPOSITORY FOR", record['fname'], record['lname'])
+        print('-'*50)
+        tbl = record['uname'].strip()
+        # TODO: what if uname does not exist?
+        data = db.listify(db.get_all_raw(tbl))
+        print(tabulate.tabulate(data, headers=db.schema(tbl), tablefmt="pretty"))
+        input("Press Return Key to Continue......")
 
 
 def record_data(record):
@@ -218,14 +242,19 @@ def broadcast_sos(record):
     Email and notify _every_ doctor in the doctor database about this patient
     """
     try:
+        # get the list of doctors from the database
         doctors = db.get_list('doctor_info', 'fname')
+
+        # get the sos message from .<fname>_sos.txt
         f = open('.{}_sos.txt'.format(record['fname']), 'r')
         sos_msg = f.read()
+
         # open file stream
+        # start looping over all doctors and write to their .notif files
         for doctor in doctors:
             try:
                 f = open('.{}_notifs.txt'.format(doctor), 'a+')
-                f.write('\n\n')
+                f.write('\n')
                 f.write(sos_msg)
                 f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
                 # TODO: add email below

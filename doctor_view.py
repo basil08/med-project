@@ -47,7 +47,6 @@ def get_patients(record):
     try:
         f = open('.{}_patients.txt'.format(record['fname']), 'r')
         for line in f.readlines():
-            print('DEBUG: patient line ', line)
             lst.append(line.split()[0])
     except: pass
     finally: return lst

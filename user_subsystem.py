@@ -84,11 +84,12 @@ def new_signup():
             f.write('Phone: {}\n\n'.format(phone))
             f.close()
             print('Default SOS Configured: You can change your message with Config SOS')
+            input("Press Enter to continue.....")
         except:
             pass
     else:
         print('\nPLEASE TRY AGAIN')
-    login()
+    initialize()
 
 
 def signup():
@@ -121,7 +122,6 @@ def login():
                 unauthorized_access()
                 sys.exit()
             else:
-
                 print('Success: Authorization successful')
                 return db.get_record_raw(USER_INFO_TBL, 'uname = "{}"'.format(name))
         else:
