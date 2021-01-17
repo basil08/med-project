@@ -119,6 +119,16 @@ def record_data(record):
         
         return db.insert_user_data(record, mutation)
 
+def read_notifs(record):
+    try:
+        f = open('.{}_notifs.txt'.format(record['uname']), 'r')
+        print(f.read())
+    except FileNotFoundError as err:
+        print('Error: Notification hasn\'t been intialized for patient')
+        # print(err.strerror)
+        print('It seems like your doctor has nothing to say.')
+    finally: 
+        input("Press Enter to continue....")
 
 
 

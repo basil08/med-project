@@ -3,6 +3,9 @@
 *.swp
 *.swo
 
+# dont track .files
+.*
+
 # pycache
 __pycache__/*
 
