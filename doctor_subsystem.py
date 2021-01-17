@@ -11,7 +11,7 @@ from consolemenu.items import *
 
 # my modules
 # import login
-import doc_view
+import doctor_view
 import util
 import db
 
@@ -134,8 +134,8 @@ def initialize():
         # apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
         
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
-        notifications_menu.append_item(FunctionItem("Read Recent Notifications", doc_view.read_notifs, [record]))
-        notifications_menu.append_item(FunctionItem("Send Notification", doc_view.send_notifs, [record]))
+        notifications_menu.append_item(FunctionItem("Read Recent Notifications", doctor_view.read_notifs, [record]))
+        notifications_menu.append_item(FunctionItem("Send Notification", doctor_view.send_notifs, [record]))
 
         # sos_menu = ConsoleMenu("SOS Broadcast", "In case of emergency, we are always by your side.")
         # sos_item = FunctionItem("SOS Broadcast", show_submenu, [sos_menu])

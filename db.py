@@ -92,6 +92,16 @@ def schema(tbl_name):
     schema = cursor.fetchall()
     return [x for (x, _, _, _, _, _) in schema]
 
+def exists(tbl_name):
+    """ Checks if tbl_name exists
+        returns: bool
+    """
+    try:
+        cursor.execute('desc {}'.format(tbl_name))
+        data = cursor.fetchall()
+        return True
+    except mc.errors.DatabaseError as err:
+        return False
 
 def has(tbl, fieldname, val):
     """ This function returns a bool for a simple exists or not condition on the field specified by the  first arg [fieldname] and value given by second arg [val].
@@ -180,7 +190,7 @@ def get_password(tbl, uname):
     return data[0]
 
 
-def getAll(tbl):
+def get_all_raw(tbl):
     """ Pretty self-explanatory
     """
 
@@ -192,8 +202,6 @@ def getAll(tbl):
     # TODO: convert Decimal('12.33') to float (idk yet)
 
 # Deprecated
-
-
 def listify(data):
     """ Flattens any high dimensional dataset into a 1d list of entries, suitable to add in a .CSV
     WARNING: IMPORTANT CAVEAT. THIS IS NOT  A GENERAL FUNCTION. It works only by assuming the schema of the user tbl
@@ -213,9 +221,35 @@ def listify(data):
         lst.append(rcd_lst)
     return lst
 
+def init_tbl(tbl_name, fields, primary=None):
+    """ Python Interface around CREATE TABLE.
+        fields [list] of string specifying name of field and their type as ['name varchar(10)', 'age int']
+        if primary is not None, sets that field as PRI
+        TODO: add NOT NULL, constraints and DEFAULT clause in a pretty way. (an obvious way is to include in 
+        fields itself) 
+        returns: nothing
+    """
+    try:
+        mutation = 'create table {} ( '.format(tbl_name)
+        for field in fields: mutation += field + ', '
+        print('DEBUG: after appending fields: ', mutation)
+        if primary != None: mutation += ' primary key({})'.format(primary)+', '
+        mutation = snip(mutation)
+        print('DEBUG: after primary and snipping: ', mutation)
+        mutation += ' );'
+
+        print('DEBUG: final: ', mutation)
+        cursor.execute(mutation)
+        mycon.commit()
+        print("Success: Created new table {}".format(tbl_name))
+    except mc.errors.ProgrammingError as err:
+        print('Error: Could not create new table {}'.format(tbl_name))
+        print(err.strerror)
+    finally:
+        input("Press Enter to continue......")
+
+
 # Deprecated. It's a function I am ashamed to have written in the first place. Don't use it!
-
-
 def init_new_user_tbl(record):
     """ Make a new table in default database with the schema same for each patient and having tblname same as record['uname']
     returns: bool

@@ -133,8 +133,7 @@ def initialize():
         ## all the menus and submenus 
         menu = ConsoleMenu("Welcome, {0}".format(record['fname']), "I am med, your personal health asistance program.")
         notifications_menu = ConsoleMenu("Notifications", "Be updated, be healthy. Always.")
-
-
+        profile_menu = ConsoleMenu("View My Profile", "All your data, now at your fingertips.")
 
 
 
@@ -143,43 +142,43 @@ def initialize():
         basic_info_item = FunctionItem("View General Information", user_view.basic_info, [record])
         body_data_item = FunctionItem("View Body Data", user_view.body_data, [record])
 
-        record_data_subitem = FunctionItem("Record Body Data", user_view.record_data, [record])
+        profile_item = FunctionItem("View My Profile", show_submenu, [profile_menu])
 
-        # NOTE: THIS record NOW HAS TO POINT TO THE NEW UPDATED RECORD OF THE PATIENT
-        # edit_data_subitem = FunctionItem("Edit Your Profile", user_view.edit_pfp, [record])
 
-        appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
-        apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
+        # record_data_subitem = FunctionItem("Record Body Data", user_view.record_data, [record])
+
+        # # NOTE: THIS record NOW HAS TO POINT TO THE NEW UPDATED RECORD OF THE PATIENT
+        # # edit_data_subitem = FunctionItem("Edit Your Profile", user_view.edit_pfp, [record])
+
+        # appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
+        # apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
         
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
         notifications_menu.append_item(FunctionItem("Read Recent Notifications", user_view.read_notifs, [record]))
         notifications_menu.append_item(FunctionItem("Send Message", user_view.send_notifs, [record]))
 
-        sos_menu = ConsoleMenu("SOS Broadcast", "In case of emergency, we are always by your side.")
-        sos_item = FunctionItem("SOS Broadcast", show_submenu, [sos_menu])
+        # sos_menu = ConsoleMenu("SOS Broadcast", "In case of emergency, we are always by your side.")
+        # sos_item = FunctionItem("SOS Broadcast", show_submenu, [sos_menu])
 
-        medbay_menu = ConsoleMenu("Medbay Online", "One-stop shop for all your meds.")
-        medbay_item = FunctionItem("Medbay Online", show_submenu, [medbay_menu])
+        # medbay_menu = ConsoleMenu("Medbay Online", "One-stop shop for all your meds.")
+        # medbay_item = FunctionItem("Medbay Online", show_submenu, [medbay_menu])
 
-        record_data_menu = ConsoleMenu("Record Your Data", "A dynamic history to better track your health.")
-        record_data_item = FunctionItem("Record Your Data", show_submenu, [record_data_menu])
+        # record_data_menu = ConsoleMenu("Record Your Data", "A dynamic history to better track your health.")
+        # record_data_item = FunctionItem("Record Your Data", show_submenu, [record_data_menu])
         
-        user_view_details_menu = ConsoleMenu("View My Profile", "All your data, now at your fingertips.")
-        user_view_details_item = FunctionItem("View My Profile", show_submenu, [user_view_details_menu])
         
-        edit_details_menu = ConsoleMenu("Edit Profile", "Edit your profile and preferences.")
-        edit_details_item = FunctionItem("Edit Profile", show_submenu, [edit_details_menu])
+        # edit_details_menu = ConsoleMenu("Edit Profile", "Edit your profile and preferences.")
+        # edit_details_item = FunctionItem("Edit Profile", show_submenu, [edit_details_menu])
+        # record_data_menu.append_item(record_data_subitem)
 
-        user_view_details_menu.append_item(basic_info_item)
-        user_view_details_menu.append_item(body_data_item)
-        user_view_details_menu.append_item(export_csv_item)
-        user_view_details_menu.append_item(export_bin_item)
-
-        record_data_menu.append_item(record_data_subitem)
-
+        profile_menu.append_item(body_data_item)
+        profile_menu.append_item(export_csv_item)
+        profile_menu.append_item(export_bin_item)
+        profile_menu.append_item(basic_info_item)
         #edit_details_menu.append_item(edit_data_subitem)
 
         menu.append_item(notifications_item)
+        menu.append_item(profile_item)
         # menu.append_item(sos_item)
         # menu.append_item(apppointment_item)
         # menu.append_item(medbay_item)

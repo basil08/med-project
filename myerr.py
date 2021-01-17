@@ -1,0 +1,3 @@
+
+class NoSuchTableError(Exception):
+    pass
