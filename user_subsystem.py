@@ -26,10 +26,9 @@ def unauthorized_access():
 def choose_doctor(tbl_name):
     doctors = db.get_list(tbl_name, 'fname')
     print('These doctors are available: ')
-    for i in range(len(doctors)): print(i, doctors[i])
+    for i in range(len(doctors)): print(i+1, doctors[i])
     ch = int(input("Enter a number: "))
-    return doctors[ch]
-
+    return doctors[ch-1]
 
 def new_signup():
     """ Self-explanatory
@@ -57,7 +56,7 @@ def new_signup():
     new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': str(random.randint(1,100000)), \
         'doctor': doctor}
 
-    # write patients name to that doctors dotfile
+    # write patients name to that doctor's dotfile
     try:
         f = open('.{}_patients.txt'.format(doctor), 'a')
     except FileNotFoundError as err:
@@ -154,6 +153,7 @@ def initialize():
         
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
         notifications_menu.append_item(FunctionItem("Read Recent Notifications", user_view.read_notifs, [record]))
+        notifications_menu.append_item(FunctionItem("Send Message", user_view.send_notifs, [record]))
 
         sos_menu = ConsoleMenu("SOS Broadcast", "In case of emergency, we are always by your side.")
         sos_item = FunctionItem("SOS Broadcast", show_submenu, [sos_menu])

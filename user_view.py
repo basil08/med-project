@@ -121,13 +121,45 @@ def record_data(record):
 
 def read_notifs(record):
     try:
-        f = open('.{}_notifs.txt'.format(record['uname']), 'r')
+        f = open('.{}_notifs.txt'.format(record['fname']), 'r')
         print(f.read())
     except FileNotFoundError as err:
         print('Error: Notification hasn\'t been intialized for patient')
         # print(err.strerror)
         print('It seems like your doctor has nothing to say.')
     finally: 
+        input("Press Enter to continue....")
+
+#
+# NOTIFICATION MODULE
+#
+# TODO: Allow users to see only 'unseen' notifications
+# and give them choice to see as many as they want, eg: 5, 10, * (for all), etc
+
+def send_notifs(record):
+    """
+
+    """
+    try:
+        doctor = record['doctor']
+        print('Sending message to {}'.format(doctor))
+        msg = input("Enter your message:\n")
+
+        # open file stream
+        try:
+            f = open('.{}_notifs.txt'.format(doctor), 'a+')
+            f.write('\n\n')
+            f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
+            f.write('Message: '+ msg + '\n')
+            f.write('From: '+record['fname'])
+            print('Success: Sent notification to {}'.format(doctor))
+        except:
+            pass
+        finally:
+            f.close()
+    except:
+        print('Error: Cannot send notification to {}'.format(doctor))
+    finally:
         input("Press Enter to continue....")
 
 

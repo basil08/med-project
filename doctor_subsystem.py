@@ -114,7 +114,7 @@ def initialize():
 
         ## all the menus and submenus 
         menu = ConsoleMenu("Welcome, doctor {0}".format(record['fname']), "I am med, How can I help you today?")
-        notifications_menu = ConsoleMenu("Notifications", "Send and receive notifs from your patients wothout hassle.")
+        notifications_menu = ConsoleMenu("Notifications", "Send and receive notifs from your patients without hassle.")
 
 
 
