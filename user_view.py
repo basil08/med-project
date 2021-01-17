@@ -193,3 +193,55 @@ def send_notifs(record):
 #
 # END NOTIFICATION MODULE
 #
+
+
+#
+# SOS MODULE
+#
+
+def config_sos(record):
+    """ Sets/Updates the Emergency SOS Broadcast message
+    """
+    try:
+        f = open('.{}_sos.txt'.format(record['fname']), 'w')
+        f.write(input('Enter your SOS Message: (Your phone and address are automatically broadcasted) '))
+        f.write('\n\nPatient name: {}\n'.format(record['fname']+' '+record['lname']))
+        f.write('Address: {}\n'.format(record['addr']))
+        f.write('Phone: {}\n\n'.format(record['phone']))
+        f.close()
+        print("Success: Configured SOS Message for {}".format(record['fname']))
+    except:
+        pass        # for now
+
+def broadcast_sos(record):
+    """
+    Email and notify _every_ doctor in the doctor database about this patient
+    """
+    try:
+        doctors = db.get_list('doctor_info', 'fname')
+        f = open('.{}_sos.txt'.format(record['fname']), 'r')
+        sos_msg = f.read()
+        # open file stream
+        for doctor in doctors:
+            try:
+                f = open('.{}_notifs.txt'.format(doctor), 'a+')
+                f.write('\n\n')
+                f.write(sos_msg)
+                f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
+                # TODO: add email below
+                #
+                #
+                print('Success: Sent SOS to {}'.format(doctor))
+            except:
+                pass
+            finally:
+                f.close()
+    except:
+        print('Error: Cannot send SOS to {}'.format(doctor))
+    finally:
+        input("Press Enter to continue....")
+    
+
+#
+# END SOS MODULE
+#

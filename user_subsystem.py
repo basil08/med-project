@@ -38,6 +38,9 @@ def new_signup():
     fname = input('Enter your first name: ').strip()
     lname = input('Enter your last name: ').strip()
     uname = input('Enter your username: ').strip()
+    addr = input('Enter your address: (will be used in case of emergency) ').strip()
+    phone = input('Enter your phone: (will be used in case of emergency) ').strip()
+
     doctor = choose_doctor('doctor_info')
     
     # ensure unique username
@@ -54,7 +57,7 @@ def new_signup():
     
     # TODO: can clash, future ver should ensure it is TRULY unique 
     new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': str(random.randint(1,100000)), \
-        'doctor': doctor}
+        'addr':addr,'phone':phone,'doctor': doctor}
 
     # write patients name to that doctor's dotfile
     try:
@@ -70,6 +73,19 @@ def new_signup():
 
     if db.insert_record(USER_INFO_TBL, new_user):
         print(fname, lname, 'has been successfully added to the database')
+
+        # Configure a defualt SOS message
+        try:
+            f = open('.{}_sos.txt'.format(fname), 'w')
+            msg = 'HELP! HELP! HELP! I AM IN DANGER! PLEASE COME FAST.\n\n'
+            f.write(msg)
+            f.write('Patient name: {}\n'.format(fname+' '+lname))
+            f.write('Address: {}\n'.format(addr))
+            f.write('Phone: {}\n\n'.format(phone))
+            f.close()
+            print('Default SOS Configured: You can change your message with Config SOS')
+        except:
+            pass
     else:
         print('\nPLEASE TRY AGAIN')
     login()
@@ -123,7 +139,6 @@ def show_submenu(menu):
 
 def initialize():
     record = login()
-    print("DEBUG record returned by login", record)
     if record == None: # shouldn't be needed, but a security check
         pass
     else:
@@ -179,7 +194,8 @@ def initialize():
 
         menu.append_item(notifications_item)
         menu.append_item(profile_item)
-        # menu.append_item(sos_item)
+        menu.append_item(FunctionItem("Edit SOS Message", user_view.config_sos,[record]))
+        menu.append_item(FunctionItem("Send SOS", user_view.broadcast_sos, [record]))
         # menu.append_item(apppointment_item)
         # menu.append_item(medbay_item)
         # menu.append_item(record_data_item)

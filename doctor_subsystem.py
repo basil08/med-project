@@ -105,7 +105,6 @@ def show_submenu(menu):
 
 def initialize():
     record = login()
-    print("DEBUG record returned by login", record)
     if record == None: # shouldn't be needed, but a security check
         pass
     else:

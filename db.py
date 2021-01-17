@@ -44,7 +44,7 @@ def insert_record(tbl, data):
     ONLY IF they are not declared as NOT NULL, in which case it throws an Error 
     TODO: Error handling doesn't show what is really wrong 
 
-    returns: bool (True if successfull insertion, false otherwise)
+    returns: bool (True if successful insertion, false otherwise)
     """
     try:
         flag = {}          # just a cheap hack and DONT be misled, its a dict inspite of its name
