@@ -5,9 +5,10 @@ import time
 #
 # TODO: Use environment variable to store passwd ffs
 #
+import os
+DB_PASS = os.getenv('DB_PASS')
 
-
-def init_db(host='localhost', user='Basil', passwd='2a19i12', db='med1'):
+def init_db(host='localhost', user='Basil', passwd=DB_PASS, db='med1'):
     try:
         mycon = mc.connect(host=host, user=user, password=passwd, database=db)
         cursor = mycon.cursor()

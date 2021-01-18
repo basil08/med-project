@@ -1,5 +1,12 @@
 import datetime
 
+# my modules
+from myerr import NoPatientError
+import mail_service as ms
+import db
+import os
+USER_INFO_TBL = os.getenv("USER_INFO_TBL")
+
 def send_notifs(record):
     """
 
@@ -17,15 +24,22 @@ def send_notifs(record):
         # NOTE: patient is the fname of a patient, not the uname
         # -1 so as to normalize the effect of +1 abpve
         patient = patients[int(input("Who to send this notification? "))-1]
-        msg = input("Enter your message:\n")
-
+        raw_msg = input("Enter your message:\n")
+        patient_email_id = db.get_list(USER_INFO_TBL, 'email', 'fname = "{}"'.format(patient))[0]
+        print("DEBUG: email id of patient", patient_email_id)
         # open file stream
         try:
             f = open('.{}_notifs.txt'.format(patient), 'a+')
-            f.write('\n\n')
-            f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
-            f.write('Message: '+ msg + '\n')
-            f.write('From: Dr. '+record['fname'])
+            msg = '\n\n'
+            msg += ('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
+            msg += ('Message: '+ raw_msg + '\n')
+            msg += ('From: Dr. '+record['fname'])
+            print("DEBUG: notif from doctor: ", msg)
+            f.write(msg)
+            # check if patient email id is not defined in database
+            if patient_email_id != None:
+                ms.send(patient_email_id, '{} | MED Notifications'.format(record['fname']), msg)
+            else: print("Warning: Cannot send email notification.\nEmail id not defined in database.")
             print('Success: Sent notification to {}'.format(patient))
         except:
             print('Error: Cannot send notification to {}'.format(patient))

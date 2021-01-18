@@ -167,6 +167,6 @@ def initialize():
         # menu.append_item(record_data_item)
         # menu.append_item(user_view_details_item)
         #menu.append_item(edit_details_item)
-        #time.sleep(1.5)
+        time.sleep(1.5)
         menu.show()
 

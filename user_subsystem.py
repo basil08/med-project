@@ -38,9 +38,9 @@ def new_signup():
     fname = input('Enter your first name: ').strip()
     lname = input('Enter your last name: ').strip()
     uname = input('Enter your username: ').strip()
+    email = input('Enter your email: ').strip()
     addr = input('Enter your address: (will be used in case of emergency) ').strip()
     phone = input('Enter your phone: (will be used in case of emergency) ').strip()
-
     doctor = choose_doctor('doctor_info')
     
     # ensure unique username
@@ -57,9 +57,11 @@ def new_signup():
     
     # TODO: can clash, future ver should ensure it is TRULY unique 
     new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': str(random.randint(1,100000)), \
-        'addr':addr,'phone':phone,'doctor': doctor}
+        'addr':addr,'phone':phone,'email':email, 'doctor': doctor}
 
     # write patients name to that doctor's dotfile
+    # TODO: It seems except doesn't run if dotfile for doctor is not found
+    # Maybe, i am having a wrong notion of the flow, thus investigate
     try:
         f = open('.{}_patients.txt'.format(doctor), 'a')
     except FileNotFoundError as err:
@@ -201,6 +203,6 @@ def initialize():
         # menu.append_item(record_data_item)
         # menu.append_item(user_view_details_item)
         #menu.append_item(edit_details_item)
-        #time.sleep(1.5)
+        time.sleep(1.5)
         menu.show()
 

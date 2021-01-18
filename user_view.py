@@ -1,3 +1,4 @@
+from myerr import NoSuchTableError
 import db
 import time
 import csv
@@ -10,10 +11,12 @@ import mysql
 
 # my modules
 import mail_service as ms
+import os
+
+DOCTOR_INFO_TBL = os.getenv('DOCTOR_INFO_TBL')
 
 # my Errors
 from myerr import NoSuchTableError
-
 
 # a dummy moods list for now
 moods = ['happy', 'sad', 'disappointed', 'depressed',
@@ -35,7 +38,7 @@ def export_to_csv(record):
         print("Error: No table for {} exists in database.".format(
             record['fname']))
         print("Creating new table for {}".format(record['fname']))
-        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',\
+        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',
                                       'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
         print("Created new table for {}".format(record['uname']))
     # attempt writing to csv after confirming table exists to read from
@@ -73,7 +76,7 @@ def export_to_bin(record):
         print("Error: No table for {} exists in database.".format(
             record['fname']))
         print("Creating new table for {}".format(record['fname']))
-        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',\
+        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',
                                       'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
         print("Created new table for {}".format(record['uname']))
     finally:
@@ -126,7 +129,7 @@ def body_data(record):
         print("Error: No table for {} exists in database.".format(
             record['fname']))
         print("Creating new table for {}".format(record['fname']))
-        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',\
+        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',
                                       'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
         print("Created new table for {}".format(record['uname']))
     finally:
@@ -150,8 +153,8 @@ def record_data(record):
         if not db.exists(tbl):
             raise NoSuchTableError()
     except NoSuchTableError:
-        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',\
-                    'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
+        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',
+                                      'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
     finally:
         # continue with data entry anyway
         print(".....No external device detected.....")
@@ -198,15 +201,27 @@ def send_notifs(record):
     try:
         doctor = record['doctor']
         print('Sending message to {}'.format(doctor))
-        msg = input("Enter your message:\n")
-
+        raw_msg = input("Enter your message:\n")
+        # query email id of doctor from db
+        # as get_list returns a list, add a condition and fetch only the first email id
+        doctor_email_id = db.get_list(
+            DOCTOR_INFO_TBL, 'email', 'fname = "{}"'.format(doctor))[0]
         # open file stream
         try:
             f = open('.{}_notifs.txt'.format(doctor), 'a+')
-            f.write('\n\n')
-            f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
-            f.write('Message: ' + msg + '\n')
-            f.write('From: '+record['fname'])
+            msg = '\n\n'
+            msg += ('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
+            msg += ('Message: ' + raw_msg + '\n')
+            msg += ('From: '+record['fname'])
+            f.write(msg)
+
+            # check if email id of doctor is not in database
+            if doctor_email_id != None:
+                ms.send(doctor_email_id, '{} | MED notifications'.format(
+                    record['fname']), msg)
+            else:
+                print(
+                    "Warning: Cannot send email notification.\nEmail id not defined in database.")
             print('Success: Sent notification to {}'.format(doctor))
         except:
             pass
@@ -239,8 +254,10 @@ def config_sos(record):
         # print("-"*50)
         # f.close()
         f = open('.{}_sos.txt'.format(record['fname']), 'w')
-        f.write(input('Enter your SOS Message: (Your phone and address are automatically broadcasted) '))
-        f.write('\n\nPatient name: {}\n'.format(record['fname']+' '+record['lname']))
+        f.write(input(
+            'Enter your SOS Message: (Your phone and address are automatically broadcasted) '))
+        f.write('\n\nPatient name: {}\n'.format(
+            record['fname']+' '+record['lname']))
         f.write('Address: {}\n'.format(record['addr']))
         f.write('Phone: {}\n\n'.format(record['phone']))
         f.close()
@@ -250,15 +267,16 @@ def config_sos(record):
     finally:
         input("Press Enter to continue....")
 
+
 def broadcast_sos(record):
     """
     Email and notify _every_ doctor in the doctor database about this patient
     """
     try:
         # get the list of doctors from the database
-        doctors = db.get_list('doctor_info', 'fname')
+        doctors = db.get_list(DOCTOR_INFO_TBL, 'fname')
 
-        mail_ids = db.get_list('doctor_info', 'email')
+        mail_ids = db.get_list(DOCTOR_INFO_TBL, 'email')
 
         # get the sos message from .<fname>_sos.txt
         f = open('.{}_sos.txt'.format(record['fname']), 'r')
@@ -268,14 +286,14 @@ def broadcast_sos(record):
         # start looping over all doctors and write to their .notif files
         for doctor, mail_id in zip(doctors, mail_ids):
             try:
-                # 'a+' as the file may not already exist 
+                # 'a+' as the file may not already exist
                 f = open('.{}_notifs.txt'.format(doctor), 'a+')
                 msg = '\n'
                 msg += sos_msg
                 msg += 'Timestamp: ' + datetime.datetime.now().ctime() + '\n'
                 f.write(msg)
                 # TODO: add email below
-                ms.send(mail_id, 'HELP! I AM IN DANGER!', msg ) 
+                ms.send(mail_id, 'HELP! I AM IN DANGER!', msg)
                 #
                 print('Success: Sent SOS to {}'.format(doctor))
             except:
@@ -286,7 +304,7 @@ def broadcast_sos(record):
         print('Error: Cannot send SOS to {}'.format(doctors))
     finally:
         input("Press Enter to continue....")
-    
+
 
 #
 # END SOS MODULE

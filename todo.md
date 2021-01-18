@@ -2,7 +2,7 @@
 
 ~~1. implement NoPatientError in doctor_view.py~~
 
-2. implement email service for notifs and SOS 
+~~2. implement email service for notifs and SOS~~
 
 3. implement record data for user and graph/insights that for doctor_view  
 
@@ -14,4 +14,6 @@
 
 6. Add admin subsystem and a config menu to configure the email id via which all emails will be sent.  
 
-7. 
+~~7. Use env var for password email, password database, user_info_tbl name and doctor_info_tbl name~~
+
+8. 
