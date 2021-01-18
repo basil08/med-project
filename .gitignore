@@ -10,7 +10,10 @@
 *.csv
 *.dat
 
+# don't track experimental files
+etc/
+pg.py
+
 # pycache
 __pycache__/*
 
-pg.py

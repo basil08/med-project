@@ -7,8 +7,8 @@ s = smtplib.SMTP('smtp.gmail.com', 587)
 
 
 sender = 'gs454236@gmail.com'
-receiver = 'royarghya13@gmail.com'
-password = '2a19i12_12a2i2'
+receiver = 'basillabib01@gmail.com'
+password = 'summerhead_2006'
   
 # start TLS for security 
 s.starttls() 

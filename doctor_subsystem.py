@@ -54,7 +54,7 @@ def new_signup():
         print(fname, lname, 'has been successfully added to the database')
     else:
         print('\nPLEASE TRY AGAIN')
-    login()
+    initialize()
 
 
 def signup():

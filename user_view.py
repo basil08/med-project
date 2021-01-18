@@ -8,6 +8,9 @@ import datetime
 import tabulate
 import mysql
 
+# my modules
+import mail_service as ms
+
 # my Errors
 from myerr import NoSuchTableError
 
@@ -227,6 +230,14 @@ def config_sos(record):
     """ Sets/Updates the Emergency SOS Broadcast message
     """
     try:
+        # TODO: print the current SOS message for user for nice UX
+        # NOTE: handle case when .<>_sos.txt doesn't exist
+        # f = open('.{}_sos.txt'.format(record['fname']), 'r')
+        # current_sos = f.read()
+        # print("-"*50, "Current SOS Message", "-"*50)
+        # print(current_sos)
+        # print("-"*50)
+        # f.close()
         f = open('.{}_sos.txt'.format(record['fname']), 'w')
         f.write(input('Enter your SOS Message: (Your phone and address are automatically broadcasted) '))
         f.write('\n\nPatient name: {}\n'.format(record['fname']+' '+record['lname']))
@@ -236,6 +247,8 @@ def config_sos(record):
         print("Success: Configured SOS Message for {}".format(record['fname']))
     except:
         pass        # for now
+    finally:
+        input("Press Enter to continue....")
 
 def broadcast_sos(record):
     """
@@ -245,20 +258,24 @@ def broadcast_sos(record):
         # get the list of doctors from the database
         doctors = db.get_list('doctor_info', 'fname')
 
+        mail_ids = db.get_list('doctor_info', 'email')
+
         # get the sos message from .<fname>_sos.txt
         f = open('.{}_sos.txt'.format(record['fname']), 'r')
         sos_msg = f.read()
 
         # open file stream
         # start looping over all doctors and write to their .notif files
-        for doctor in doctors:
+        for doctor, mail_id in zip(doctors, mail_ids):
             try:
+                # 'a+' as the file may not already exist 
                 f = open('.{}_notifs.txt'.format(doctor), 'a+')
-                f.write('\n')
-                f.write(sos_msg)
-                f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
+                msg = '\n'
+                msg += sos_msg
+                msg += 'Timestamp: ' + datetime.datetime.now().ctime() + '\n'
+                f.write(msg)
                 # TODO: add email below
-                #
+                ms.send(mail_id, 'HELP! I AM IN DANGER!', msg ) 
                 #
                 print('Success: Sent SOS to {}'.format(doctor))
             except:
@@ -266,7 +283,7 @@ def broadcast_sos(record):
             finally:
                 f.close()
     except:
-        print('Error: Cannot send SOS to {}'.format(doctor))
+        print('Error: Cannot send SOS to {}'.format(doctors))
     finally:
         input("Press Enter to continue....")
     

@@ -7,33 +7,32 @@ def send_notifs(record):
     patients = get_patients(record)
     try:
         if len(patients) <= 0:
-            print('You are not assigned to any patient.\n')
+            raise NoPatientError
             # TODO: Write a Error as NoPatientError
             # and change the below line ffs
             # raise NoFileFoundError
             # remove if/else when NoPatientError is implemented
-        else:    
             # i+1 as improved UX. indexing from 1...
-            for i in range(len(patients)): print(i+1, patients[i])
-            # NOTE: patient is the fname of a patient, not the uname
-            # -1 so as to normalize the effect of +1 abpve
-            patient = patients[int(input("Who to send this notification? "))-1]
-            msg = input("Enter your message:\n")
+        for i in range(len(patients)): print(i+1, patients[i])
+        # NOTE: patient is the fname of a patient, not the uname
+        # -1 so as to normalize the effect of +1 abpve
+        patient = patients[int(input("Who to send this notification? "))-1]
+        msg = input("Enter your message:\n")
 
-            # open file stream
-            try:
-                f = open('.{}_notifs.txt'.format(patient), 'a+')
-                f.write('\n\n')
-                f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
-                f.write('Message: '+ msg + '\n')
-                f.write('From: Dr. '+record['fname'])
-                print('Success: Sent notification to {}'.format(patient))
-            except:
-                print('Error: Cannot send notification to {}'.format(patient))
-            finally:
-                f.close()
+        # open file stream
+        try:
+            f = open('.{}_notifs.txt'.format(patient), 'a+')
+            f.write('\n\n')
+            f.write('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
+            f.write('Message: '+ msg + '\n')
+            f.write('From: Dr. '+record['fname'])
+            print('Success: Sent notification to {}'.format(patient))
+        except:
+            print('Error: Cannot send notification to {}'.format(patient))
+        finally:
+            f.close()
     except:
-        pass
+        print('You are not assigned to any patient.\n')
     finally:
         input("Press Enter to continue....")
 
