@@ -24,11 +24,15 @@ def unauthorized_access():
     print('*'*20,' ABORT ','*'*20)
 
 def choose_doctor(tbl_name):
-    doctors = db.get_list(tbl_name, 'fname')
-    print('These doctors are available: ')
-    for i in range(len(doctors)): print(i+1, doctors[i])
-    ch = int(input("Enter a number: "))
-    return doctors[ch-1]
+    try:
+        doctors = db.get_list(tbl_name, 'fname')
+        specialities = db.get_list(tbl_name, 'speciality')
+        print('These doctors are available: ')
+        for i in range(len(doctors)): print(i+1, doctors[i],'\t',specialities[i])
+        ch = int(input("Enter a number: "))
+        return doctors[ch-1]
+    except:
+        print("Error: Cannot retrieve available doctor froom doctor database")
 
 def new_signup():
     """ Self-explanatory
@@ -114,7 +118,7 @@ def login():
         print("Welcome to user authentication portal")
         print("=========================")
         name = input('Username> ').strip()
-        password = getpass.getpass(prompt='Password ??? ')
+        password = getpass.getpass(prompt='Password:\n??? ')
         
         if db.has(USER_INFO_TBL,'uname',name):
             # check for pass
@@ -167,9 +171,11 @@ def initialize():
         # # NOTE: THIS record NOW HAS TO POINT TO THE NEW UPDATED RECORD OF THE PATIENT
         # # edit_data_subitem = FunctionItem("Edit Your Profile", user_view.edit_pfp, [record])
 
-        # appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
-        # apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
-        
+        appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
+        apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
+        appointment_menu.append_item(FunctionItem("Fix an Appointment", user_view.fix_appointment, [record]))
+        appointment_menu.append_item(FunctionItem("My Appointments", user_view.read_appointments, [record]))
+
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
         notifications_menu.append_item(FunctionItem("Read Recent Notifications", user_view.read_notifs, [record]))
         notifications_menu.append_item(FunctionItem("Send Message", user_view.send_notifs, [record]))
@@ -198,7 +204,7 @@ def initialize():
         menu.append_item(profile_item)
         menu.append_item(FunctionItem("Edit SOS Message", user_view.config_sos,[record]))
         menu.append_item(FunctionItem("Send SOS", user_view.broadcast_sos, [record]))
-        # menu.append_item(apppointment_item)
+        menu.append_item(apppointment_item)
         # menu.append_item(medbay_item)
         # menu.append_item(record_data_item)
         # menu.append_item(user_view_details_item)

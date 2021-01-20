@@ -23,8 +23,6 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase 
 from email import encoders 
 
-# TODO: use environment variables ffs
-
 def send(toaddr, subject, body):
     """
     Send an email with subject and body to toaddr. 

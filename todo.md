@@ -12,7 +12,7 @@
 
 5. update basic info for user. 
 
-6. Add admin subsystem and a config menu to configure the email id via which all emails will be sent.  
+~~6. Add admin subsystem and a config menu to configure the email id via which all emails will be sent.~~ (IDs are loaded via env variables)
 
 ~~7. Use env var for password email, password database, user_info_tbl name and doctor_info_tbl name~~
 
