@@ -56,7 +56,6 @@ def export_to_csv(record):
         csvfile.close()
         input('Press Enter Key to Continue......')
 
-
 def export_to_bin(record):
     """ Writes the contents of the table 'uname' where uname is supplied bu the record to a DAT file in the same directory.
     returns: nothing
@@ -90,7 +89,6 @@ def export_to_bin(record):
         datfile.close()
         input('Press Enter Key to Continue.........')
 
-
 def basic_info(record):
     """ puts basic info to stdout in tabular format
     basic info means data in 'user_info' tbl
@@ -107,7 +105,6 @@ def basic_info(record):
 
     print(tabulate.tabulate(l, headers=["Field", "Data"], tablefmt="pretty"))
     input('Return to continue.....')
-
 
 def body_data(record):
     """ puts body data to stdout in tabular format
@@ -141,9 +138,6 @@ def body_data(record):
 #
 # NOTIFICATION MODULE
 #
-# TODO: Allow users to see only 'unseen' notifications
-# and give them choice to see as many as they want, eg: 5, 10, * (for all), etc
-
 def read_notifs(record):
     """
     Straight-forward, try to open the user's notifs text file and read all notifications.
@@ -261,67 +255,4 @@ def broadcast_sos(record):
         input("Press Enter to continue....")
 #
 # END SOS MODULE
-#
-
-#
-# APPOINTMENT MODULE
-#
-def fix_appointment(record):
-    """ Fix an appointment in anyone of the upcoming 7 days.
-        Appointed days are shown as taken.
-    """
-    try:
-        f = open('.{}_appointments.txt'.format(record['doctor']), 'r')
-    except: 
-        print("Appointment file does not exist for {}".format(record['doctor']))
-        # make one here
-    finally:
-        lines = filter(f.readlines(), '\n')
-        lines = [line.split(':') for line in lines]
-        available = [date for date, status in lines if 'Appointed' not in status]
-        for i in range(len(available)): print(i,'\t', available[i])
-        ch = int(input("Choose a slot: "))
-        f = open('.{}_appointments.txt'.format(record['doctor']), 'w')
-        
-
-        input("Press Enter to continue....")
-
-def fix_appointment(record):
-    """ Do stuff....
-    """
-    try:
-        if not db.exists('{}_appointments.txt'.format(record['doctor'])):
-            raise NoSuchTableError
-    except: 
-        # make new table for this doctor
-        print("No database for {} appointment has been initialized".format(record['doctor']))
-        print("Creating new table for {}".format(record['doctor']))
-        db.init_tbl('{}_appointments', ['date date', 'available varchar(6)', 'patient varchar(30)'])
-        # find a list of string of dates for next 7 days from today
-        # ad each as a record in the table
-        print('Created new table for {}'.format(record['doctor']))
-    finally:
-        # for all unavailable days, show it to user
-        # update record if user appoints that date
-
-        # do appointment shit
-        print("Coming soon....appointments")
-        
-def filter(lst, symbol):
-    """ A helper to remove symbol from the last of every elem of lst (if exists)
-        And return a new list
-        returns: list
-    """
-    outlist = []
-    for elem in lst: 
-        if symbol == elem[len(elem)-1]:
-            elem = elem[:len(elem)-1]
-        outlist.append(elem)
-    return outlist
-
-def read_appointments(record):
-    pass
-
-#
-# END APPOINTMENT MODULE
 #

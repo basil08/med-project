@@ -1,6 +1,5 @@
 import datetime
 
-# my modules
 from myerr import NoPatientError
 import mail_service as ms
 import db
@@ -14,7 +13,6 @@ def send_notifs(record):
     (If that file does not exist, exit with grace as noone has this doc assigned)
     Read the msg, write to <patient>_notifs.txt (create if doesn't exist)
     and try to send email to that id
-
     """
     patients = get_patients(record)
     try:

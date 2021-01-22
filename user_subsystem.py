@@ -15,8 +15,6 @@ import user_view
 import util
 import db
 
-# should ideally load from an environment variable 
-# but ok for now
 USER_INFO_TBL = os.getenv("USER_INFO_TBL")
 
 def unauthorized_access():
@@ -59,13 +57,9 @@ def new_signup():
         print('Passwords do not match\nAbort')
         sys.exit()
     
-    # TODO: id can clash, future ver should ensure it is TRULY unique 
     new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': str(random.randint(1,100000)), \
         'addr':addr,'phone':phone,'email':email, 'doctor': doctor}
 
-    # write patients name to that doctor's dotfile
-    # TODO: It seems except doesn't run if dotfile for doctor is not found
-    # Maybe, i am having a wrong notion of the flow, thus investigate
     try:
         f = open('.{}_patients.txt'.format(doctor), 'a')
     except FileNotFoundError as err:
@@ -80,7 +74,7 @@ def new_signup():
     if db.insert_record(USER_INFO_TBL, new_user):
         print(fname, lname, 'has been successfully added to the database')
 
-        # Configure a defualt SOS message
+        # Configure a default SOS message
         try:
             f = open('.{}_sos.txt'.format(fname), 'w')
             msg = 'HELP! HELP! HELP! I AM IN DANGER! PLEASE COME FAST.\n\n'
@@ -97,11 +91,9 @@ def new_signup():
         print('\nPLEASE TRY AGAIN')
     initialize()
 
-
 def signup():
     util.cls()
     print('-----------')
-    # USE MENU HERE IN LINUX PLATFORMS
     print('You did not enter a username and password during login\nDo you want to create an account?(y/N)')
     print('------------')
     ch = input()
@@ -140,7 +132,6 @@ def login():
     except:
         pass            # for now
 
-
 def show_submenu(menu):
     menu.show()
 
@@ -174,7 +165,6 @@ def initialize():
         profile_menu.append_item(export_csv_item)
         profile_menu.append_item(export_bin_item)
         profile_menu.append_item(basic_info_item)
-        #edit_details_menu.append_item(edit_data_subitem)
 
         menu.append_item(notifications_item)
         menu.append_item(profile_item)
@@ -183,4 +173,3 @@ def initialize():
         menu.append_item(apppointment_item)
         time.sleep(1.5)
         menu.show()
-

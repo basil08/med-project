@@ -1,11 +1,8 @@
 import mysql.connector as mc
 import datetime
 import time
-
-#
-# TODO: Use environment variable to store passwd ffs
-#
 import os
+
 DB_PASS = os.getenv('DB_PASS')
 
 def init_db(host='localhost', user='Basil', passwd=DB_PASS, db='med1'):
@@ -17,13 +14,9 @@ def init_db(host='localhost', user='Basil', passwd=DB_PASS, db='med1'):
     except Error as e:
         print(e)
 
-
 def desc_tbl(tbl_name):
     cursor.execute('describe {0}'.format(tbl_name))
     return cursor.fetchall()
-    # schema is a list on n tuples with n field names and meta
-    # so get just the first of those (the name)
-
 
 def snip(string, char=2):
     """ A tiny helper 
@@ -31,20 +24,14 @@ def snip(string, char=2):
     """
     return string[:len(string)-char]
 
-
 def insert_record(tbl, data):
     """ Insert a PythonDict object ('data') into the tbl table
-
     data is a dictionary of user_info records. Think MongoDB in MySQL.
-
     NOTE: keys and values of the dict MUST be string.
-
     FUTURE TODO: allow lists as values and 'flatten' it into a string
-
     MySQL initializes unspecified fields with NULL 
     ONLY IF they are not declared as NOT NULL, in which case it throws an Error 
     TODO: Error handling doesn't show what is really wrong 
-
     returns: bool (True if successful insertion, false otherwise)
     """
     try:
@@ -76,14 +63,12 @@ def insert_record(tbl, data):
         print('[-] Error: Unable to add new entry to database.')
         return False
 
-
 def typeof(tbl, field):
     schema = desc_tbl(tbl)
     for tpl in schema:
         if tpl[0] == field:
             return str(tpl[1])
     return None
-
 
 def schema(tbl_name):
     """ Returns a list of all the fieldnames in the table
@@ -105,16 +90,13 @@ def exists(tbl_name):
 
 def has(tbl, fieldname, val):
     """ This function returns a bool for a simple exists or not condition on the field specified by the  first arg [fieldname] and value given by second arg [val].
-
     It simply checks for _at least_ one existence of that val in the tbl
-
     returns: bool
     """
     mutation = 'select * from {0} where {1} = "{2}"'.format(
         tbl, fieldname, val)
     cursor.execute(mutation)
     return len(cursor.fetchall()) > 0
-
 
 def count(tbl):
     """ Return a count of the number of records in the table tbl
@@ -125,11 +107,8 @@ def count(tbl):
     cursor.execute(query)
     data = cursor.fetchall()[0]
     return int(data[0])
-
 #
 # GETTERS
-#
-
 def get_list(tbl, field, condition=None):
     """
     return a python list of the form 'select field from tbl where condition'
@@ -144,24 +123,13 @@ def get_list(tbl, field, condition=None):
         return [x[0] for x in data]
     except:
         print('Error: cannot read list from db in get_list')
-#
-# This thing is not working properly
-def get_records(tbl, fieldname, val):
-    """ Returns a Python DictObject with the record having fieldname = val
-
-    returns: a list of _all_ matched records
-    """
-    query = 'select * from {0} where {1} = "{2}"'.format(tbl, fieldname, val)
-    cursor.execute(query)
-    data = cursor.fetchall()
-    return data
 
 def get_record(tbl, option):
     """ Returns a DictObject with the record matching option.key == options.value
-
     returns: the first match, in case of multiple matched records, this is equivalent to get_records()[0]
     none if no results hit
     """
+    fieldname, val = option
     query = 'select * from {0} where {1} = "{2}"'.format(tbl, fieldname, val)
     cursor.execute(query)
     data = cursor.fetchone()
@@ -185,21 +153,17 @@ def get_password(tbl, uname):
     data = cursor.fetchone()
     return data[0]
 
-
 def get_all_raw(tbl):
     """ Pretty self-explanatory
     """
-
     query = 'select * from {0}'.format(tbl)
     cursor.execute(query)
     data = cursor.fetchall()
     return data
-    # TODO:convert datetime.datetime to a string representation (see man)
-    # TODO: convert Decimal('12.33') to float (idk yet)
 
-# Deprecated
 def listify(data):
-    """ Flattens any high dimensional dataset into a 1d list of entries, suitable to add in a .CSV
+    """ Deprecated
+    Flattens any high dimensional dataset into a 1d list of entries, suitable to add in a .CSV
     WARNING: IMPORTANT CAVEAT. THIS IS NOT  A GENERAL FUNCTION. It works only by assuming the schema of the user tbl
     NB: rcd = record
     """
@@ -241,7 +205,6 @@ def init_tbl(tbl_name, fields, primary=None):
     finally:
         input("Press Enter to continue......")
 
-
 # Deprecated. It's a function I am ashamed to have written in the first place. Don't use it!
 def init_new_user_tbl(record):
     """ Make a new table in default database with the schema same for each patient and having tblname same as record['uname']
@@ -259,8 +222,6 @@ def init_new_user_tbl(record):
     except:
         print('Fatal Error: Could not create new table')
 
-
-# Deprecated
 def insert_user_data(record, mutation):
     """ Records a specialised entry point for each user into their respective tables. 
     returns: bool
@@ -275,10 +236,4 @@ def insert_user_data(record, mutation):
     except:
         print('Error: Could not write data entry to your table.')
 
-
-# def exec(mutation):
-#     # add pre-processing here
-#     cursor = connect()
-#     cursor.execute(mutation)
-#     data = cursor.fetchall()
 mycon, cursor = init_db()

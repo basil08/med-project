@@ -16,8 +16,6 @@ import util
 import db
 import os
 
-# should ideally load from an environment variable 
-# but ok for now
 DOCTOR_INFO_TBL = os.getenv("DOCTOR_INFO_TBL")
 
 def unauthorized_access():
@@ -47,7 +45,6 @@ def new_signup():
         print('Passwords do not match\nAbort')
         sys.exit()
     
-    # TODO: can clash, future ver should ensure it is TRULY unique 
     new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, \
         'speciality': special, 'association': assoc, 'id': str(random.randint(1,100000))}
 
@@ -60,7 +57,6 @@ def new_signup():
 def signup():
     util.cls()
     print('-----------')
-    # USE MENU HERE IN LINUX PLATFORMS
     print('You did not enter a username and password during login\nDo you want to create an account?(y/N)')
     print('------------')
     ch = input()
@@ -85,7 +81,6 @@ def login():
                 unauthorized_access()
                 sys.exit()
             else:
-
                 print('Success: Authorization successful')
                 return db.get_record_raw(DOCTOR_INFO_TBL, 'uname = "{}"'.format(name))
         else:
