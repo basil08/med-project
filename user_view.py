@@ -1,4 +1,4 @@
-from myerr import NoSuchTableError
+from myerr import NoSuchTableError, NoPatientError
 import db
 import time
 import csv
@@ -15,13 +15,9 @@ import os
 
 DOCTOR_INFO_TBL = os.getenv('DOCTOR_INFO_TBL')
 
-# my Errors
-from myerr import NoSuchTableError
-
 # a dummy moods list for now
 moods = ['happy', 'sad', 'disappointed', 'depressed',
          'angry', 'excited', 'shocked', 'delighted']
-
 
 def export_to_csv(record):
     """ Writes the contents of the table 'uname' where uname is supplied by the record to a CSV file in the same directory.
@@ -52,7 +48,6 @@ def export_to_csv(record):
         try:
             # listify() flattens everything into a 1d list of entries
             data = db.listify(db.get_all_raw(tbl))
-            # print('DEBUG: COUNT',db.count(tbl))
             for rcd in data:
                 f.writerow(rcd)
             print('Success: Data written to {0}'.format(csvfilename))
@@ -142,38 +137,6 @@ def body_data(record):
         print(tabulate.tabulate(data, headers=db.schema(tbl), tablefmt="pretty"))
         input("Press Return Key to Continue......")
 
-
-def record_data(record):
-    """ Update the record of a user with the data entered. Basically a INSERT mutation is run.
-    Also handles the case of first time initialization.
-    returns: bool (indicate success/failure)
-    """
-    tbl = record['uname'].strip()
-    try:
-        if not db.exists(tbl):
-            raise NoSuchTableError()
-    except NoSuchTableError:
-        db.init_tbl(record['uname'], ['timestamp datetime', 'weight dec(6,2)', 'height dec(6,2)',
-                                      'hrate dec(6,2)', 'pressure dec(6,2)', 'sleep int', 'steps int', 'mood varchar(14)'])
-    finally:
-        # continue with data entry anyway
-        print(".....No external device detected.....")
-        print(".....Reverting to manual data point entry.....")
-        wt = float(input("Enter your weight: "))
-        ht = float(input("Enter your height: "))
-        hrate = float(input("Enter your heart rate: "))
-        press = float(input("Enter your blood pressure: "))
-        sleep = int(input("How many hours did you sleep last night?"))
-        steps = int(input("How much did you walk yesterday?"))
-        print(moods)
-
-        # TODO: what if user entered something outside predefined moods
-        mood = input("Choose one of the options above...")
-
-        # wtf is this???!!
-        mutation = 'insert into {0} values ("{1}",{2},{3},{4},{5},{6},{7},"{8}")'.format(
-            tbl, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), wt, ht, hrate, press, sleep, steps, mood)
-
         return db.insert_user_data(record, mutation)
 #
 # NOTIFICATION MODULE
@@ -181,22 +144,28 @@ def record_data(record):
 # TODO: Allow users to see only 'unseen' notifications
 # and give them choice to see as many as they want, eg: 5, 10, * (for all), etc
 
-
 def read_notifs(record):
+    """
+    Straight-forward, try to open the user's notifs text file and read all notifications.
+    If File doesn't exist, then doctor assigned has not notified even once.
+    Delete the <uname>_notifs.txt file to reset notifs for this user.
+    returns: nothing
+    """
     try:
         f = open('.{}_notifs.txt'.format(record['fname']), 'r')
         print(f.read())
     except FileNotFoundError as err:
         print('Error: Notification hasn\'t been intialized for patient')
-        # print(err.strerror)
         print('It seems like your doctor has nothing to say.')
     finally:
         input("Press Enter to continue....")
 
-
 def send_notifs(record):
     """
-
+    Get this patients doctor record from db, then fetch that doctors email.
+    Input msg and try to send an email and write to <doctor>_notifs.txt
+    Handle exceptions related to email here
+    returns: nothing
     """
     try:
         doctor = record['doctor']
@@ -224,35 +193,22 @@ def send_notifs(record):
                     "Warning: Cannot send email notification.\nEmail id not defined in database.")
             print('Success: Sent notification to {}'.format(doctor))
         except:
-            pass
+            print("Error: Could not send email notification to {}".format(doctor))
         finally:
             f.close()
     except:
         print('Error: Cannot send notification to {}'.format(doctor))
     finally:
         input("Press Enter to continue....")
-
 #
 # END NOTIFICATION MODULE
-#
 
-
-#
 # SOS MODULE
 #
-
 def config_sos(record):
     """ Sets/Updates the Emergency SOS Broadcast message
     """
     try:
-        # TODO: print the current SOS message for user for nice UX
-        # NOTE: handle case when .<>_sos.txt doesn't exist
-        # f = open('.{}_sos.txt'.format(record['fname']), 'r')
-        # current_sos = f.read()
-        # print("-"*50, "Current SOS Message", "-"*50)
-        # print(current_sos)
-        # print("-"*50)
-        # f.close()
         f = open('.{}_sos.txt'.format(record['fname']), 'w')
         f.write(input(
             'Enter your SOS Message: (Your phone and address are automatically broadcasted) '))
@@ -266,7 +222,6 @@ def config_sos(record):
         pass        # for now
     finally:
         input("Press Enter to continue....")
-
 
 def broadcast_sos(record):
     """
@@ -304,8 +259,6 @@ def broadcast_sos(record):
         print('Error: Cannot send SOS to {}'.format(doctors))
     finally:
         input("Press Enter to continue....")
-
-
 #
 # END SOS MODULE
 #
@@ -324,11 +277,8 @@ def fix_appointment(record):
         # make one here
     finally:
         lines = filter(f.readlines(), '\n')
-        # print("DEBUG: lines before", lines)
         lines = [line.split(':') for line in lines]
-        # print("DEBUG: lines after", lines)
         available = [date for date, status in lines if 'Appointed' not in status]
-        print("DEBUG: available", available)
         for i in range(len(available)): print(i,'\t', available[i])
         ch = int(input("Choose a slot: "))
         f = open('.{}_appointments.txt'.format(record['doctor']), 'w')
@@ -366,9 +316,7 @@ def filter(lst, symbol):
     for elem in lst: 
         if symbol == elem[len(elem)-1]:
             elem = elem[:len(elem)-1]
-            # print("DEBUG: out elem: ", elem)
         outlist.append(elem)
-    # print("DEBUG: outlist", outlist)
     return outlist
 
 def read_appointments(record):

@@ -4,20 +4,20 @@ import time
 import getpass
 import random
 import sys
+import os
 
 # installed
 from consolemenu import *
 from consolemenu.items import *
 
 # my modules
-# import login
 import user_view
 import util
 import db
 
 # should ideally load from an environment variable 
 # but ok for now
-USER_INFO_TBL = 'user_info'
+USER_INFO_TBL = os.getenv("USER_INFO_TBL")
 
 def unauthorized_access():
     print('Unauthorized access: Incorrect Password')
@@ -59,7 +59,7 @@ def new_signup():
         print('Passwords do not match\nAbort')
         sys.exit()
     
-    # TODO: can clash, future ver should ensure it is TRULY unique 
+    # TODO: id can clash, future ver should ensure it is TRULY unique 
     new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': str(random.randint(1,100000)), \
         'addr':addr,'phone':phone,'email':email, 'doctor': doctor}
 
@@ -115,6 +115,9 @@ def login():
         # clear current buffer
         util.cls()
         print("=========================")
+        print("\tMed\t")
+        print("=========================")
+        print("=========================")
         print("Welcome to user authentication portal")
         print("=========================")
         name = input('Username> ').strip()
@@ -122,8 +125,6 @@ def login():
         
         if db.has(USER_INFO_TBL,'uname',name):
             # check for pass
-#            print('DEBUG: from user',password)
-#            print('DEBUG: db',db.getPassword(USER_INFO_TBL, name))
             if not password == db.get_password(USER_INFO_TBL, name):
                 unauthorized_access()
                 sys.exit()
@@ -148,15 +149,10 @@ def initialize():
     if record == None: # shouldn't be needed, but a security check
         pass
     else:
-        # setup a menu
-        # and welcome the patient
-
         ## all the menus and submenus 
         menu = ConsoleMenu("Welcome, {0}".format(record['fname']), "I am med, your personal health asistance program.")
         notifications_menu = ConsoleMenu("Notifications", "Be updated, be healthy. Always.")
         profile_menu = ConsoleMenu("View My Profile", "All your data, now at your fingertips.")
-
-
 
         export_bin_item = FunctionItem("Export Your Data To Binary", user_view.export_to_bin, [record])
         export_csv_item = FunctionItem("Export Your Data To CSV", user_view.export_to_csv, [record])
@@ -164,12 +160,6 @@ def initialize():
         body_data_item = FunctionItem("View Body Data", user_view.body_data, [record])
 
         profile_item = FunctionItem("View My Profile", show_submenu, [profile_menu])
-
-
-        # record_data_subitem = FunctionItem("Record Body Data", user_view.record_data, [record])
-
-        # # NOTE: THIS record NOW HAS TO POINT TO THE NEW UPDATED RECORD OF THE PATIENT
-        # # edit_data_subitem = FunctionItem("Edit Your Profile", user_view.edit_pfp, [record])
 
         appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
         apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
@@ -179,20 +169,6 @@ def initialize():
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
         notifications_menu.append_item(FunctionItem("Read Recent Notifications", user_view.read_notifs, [record]))
         notifications_menu.append_item(FunctionItem("Send Message", user_view.send_notifs, [record]))
-
-        # sos_menu = ConsoleMenu("SOS Broadcast", "In case of emergency, we are always by your side.")
-        # sos_item = FunctionItem("SOS Broadcast", show_submenu, [sos_menu])
-
-        # medbay_menu = ConsoleMenu("Medbay Online", "One-stop shop for all your meds.")
-        # medbay_item = FunctionItem("Medbay Online", show_submenu, [medbay_menu])
-
-        # record_data_menu = ConsoleMenu("Record Your Data", "A dynamic history to better track your health.")
-        # record_data_item = FunctionItem("Record Your Data", show_submenu, [record_data_menu])
-        
-        
-        # edit_details_menu = ConsoleMenu("Edit Profile", "Edit your profile and preferences.")
-        # edit_details_item = FunctionItem("Edit Profile", show_submenu, [edit_details_menu])
-        # record_data_menu.append_item(record_data_subitem)
 
         profile_menu.append_item(body_data_item)
         profile_menu.append_item(export_csv_item)
@@ -205,10 +181,6 @@ def initialize():
         menu.append_item(FunctionItem("Edit SOS Message", user_view.config_sos,[record]))
         menu.append_item(FunctionItem("Send SOS", user_view.broadcast_sos, [record]))
         menu.append_item(apppointment_item)
-        # menu.append_item(medbay_item)
-        # menu.append_item(record_data_item)
-        # menu.append_item(user_view_details_item)
-        #menu.append_item(edit_details_item)
         time.sleep(1.5)
         menu.show()
 

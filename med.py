@@ -18,8 +18,6 @@ def main():
         print(e)
         sys.exit()
 
-#    email_service.init_smtp()
-
     if options[0][0] == '-p' or options[0][0] == '--patient':
         user_subsystem.initialize()
     elif options[0][0] == '-d' or options[0][0] == '--doctor':

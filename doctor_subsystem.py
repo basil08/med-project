@@ -14,10 +14,11 @@ from consolemenu.items import *
 import doctor_view
 import util
 import db
+import os
 
 # should ideally load from an environment variable 
 # but ok for now
-DOCTOR_INFO_TBL = 'doctor_info'
+DOCTOR_INFO_TBL = os.getenv("DOCTOR_INFO_TBL")
 
 def unauthorized_access():
     print('Unauthorized access: Incorrect Password')
@@ -56,7 +57,6 @@ def new_signup():
         print('\nPLEASE TRY AGAIN')
     initialize()
 
-
 def signup():
     util.cls()
     print('-----------')
@@ -81,8 +81,6 @@ def login():
         
         if db.has(DOCTOR_INFO_TBL,'uname',name):
             # check for pass
-#            print('DEBUG: from user',password)
-#            print('DEBUG: db',db.getPassword(DOCTOR_INFO_TBL, name))
             if not password == db.get_password(DOCTOR_INFO_TBL, name):
                 unauthorized_access()
                 sys.exit()
@@ -99,7 +97,6 @@ def login():
     except:
         pass            # for now
 
-
 def show_submenu(menu):
     menu.show()
 
@@ -108,65 +105,14 @@ def initialize():
     if record == None: # shouldn't be needed, but a security check
         pass
     else:
-        # setup a menu
-        # and welcome the patient
-
         ## all the menus and submenus 
         menu = ConsoleMenu("Welcome, doctor {0}".format(record['fname']), "I am med, How can I help you today?")
         notifications_menu = ConsoleMenu("Notifications", "Send and receive notifs from your patients without hassle.")
-
-
-
-
-
-        # export_bin_item = FunctionItem("Export Your Data To Binary", user_view.export_to_bin, [record])
-        # export_csv_item = FunctionItem("Export Your Data To CSV", user_view.export_to_csv, [record])
-        # basic_info_item = FunctionItem("View General Information", user_view.basic_info, [record])
-        # body_data_item = FunctionItem("View Body Data", user_view.body_data, [record])
-
-        # record_data_subitem = FunctionItem("Record Body Data", user_view.record_data, [record])
-
-        # # NOTE: THIS record NOW HAS TO POINT TO THE NEW UPDATED RECORD OF THE PATIENT
-        # # edit_data_subitem = FunctionItem("Edit Your Profile", user_view.edit_pfp, [record])
-
-        # appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
-        # apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
         
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
         notifications_menu.append_item(FunctionItem("Read Recent Notifications", doctor_view.read_notifs, [record]))
         notifications_menu.append_item(FunctionItem("Send Notification", doctor_view.send_notifs, [record]))
 
-        # sos_menu = ConsoleMenu("SOS Broadcast", "In case of emergency, we are always by your side.")
-        # sos_item = FunctionItem("SOS Broadcast", show_submenu, [sos_menu])
-
-        # medbay_menu = ConsoleMenu("Medbay Online", "One-stop shop for all your meds.")
-        # medbay_item = FunctionItem("Medbay Online", show_submenu, [medbay_menu])
-
-        # record_data_menu = ConsoleMenu("Record Your Data", "A dynamic history to better track your health.")
-        # record_data_item = FunctionItem("Record Your Data", show_submenu, [record_data_menu])
-        
-        # user_view_details_menu = ConsoleMenu("View My Profile", "All your data, now at your fingertips.")
-        # user_view_details_item = FunctionItem("View My Profile", show_submenu, [user_view_details_menu])
-        
-        # edit_details_menu = ConsoleMenu("Edit Profile", "Edit your profile and preferences.")
-        # edit_details_item = FunctionItem("Edit Profile", show_submenu, [edit_details_menu])
-
-        # user_view_details_menu.append_item(basic_info_item)
-        # user_view_details_menu.append_item(body_data_item)
-        # user_view_details_menu.append_item(export_csv_item)
-        # user_view_details_menu.append_item(export_bin_item)
-
-        # record_data_menu.append_item(record_data_subitem)
-
-        #edit_details_menu.append_item(edit_data_subitem)
-
         menu.append_item(notifications_item)
-        # menu.append_item(sos_item)
-        # menu.append_item(apppointment_item)
-        # menu.append_item(medbay_item)
-        # menu.append_item(record_data_item)
-        # menu.append_item(user_view_details_item)
-        #menu.append_item(edit_details_item)
         time.sleep(1.5)
         menu.show()
-

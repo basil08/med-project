@@ -5,28 +5,27 @@ from myerr import NoPatientError
 import mail_service as ms
 import db
 import os
+
 USER_INFO_TBL = os.getenv("USER_INFO_TBL")
 
 def send_notifs(record):
     """
+    Read <doctor>_patients.txt file and ask who to send notification to...
+    (If that file does not exist, exit with grace as noone has this doc assigned)
+    Read the msg, write to <patient>_notifs.txt (create if doesn't exist)
+    and try to send email to that id
 
     """
     patients = get_patients(record)
     try:
         if len(patients) <= 0:
             raise NoPatientError
-            # TODO: Write a Error as NoPatientError
-            # and change the below line ffs
-            # raise NoFileFoundError
-            # remove if/else when NoPatientError is implemented
-            # i+1 as improved UX. indexing from 1...
         for i in range(len(patients)): print(i+1, patients[i])
         # NOTE: patient is the fname of a patient, not the uname
         # -1 so as to normalize the effect of +1 abpve
         patient = patients[int(input("Who to send this notification? "))-1]
         raw_msg = input("Enter your message:\n")
         patient_email_id = db.get_list(USER_INFO_TBL, 'email', 'fname = "{}"'.format(patient))[0]
-        print("DEBUG: email id of patient", patient_email_id)
         # open file stream
         try:
             f = open('.{}_notifs.txt'.format(patient), 'a+')
@@ -34,7 +33,6 @@ def send_notifs(record):
             msg += ('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
             msg += ('Message: '+ raw_msg + '\n')
             msg += ('From: Dr. '+record['fname'])
-            print("DEBUG: notif from doctor: ", msg)
             f.write(msg)
             # check if patient email id is not defined in database
             if patient_email_id != None:
@@ -50,11 +48,9 @@ def send_notifs(record):
     finally:
         input("Press Enter to continue....")
 
-
 def get_patients(record):
     """
     Read the doctors patients file and return a list of the patient's fname
-    
     """
     lst = []
     try:

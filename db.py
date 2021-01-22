@@ -69,7 +69,6 @@ def insert_record(tbl, data):
                 mutation += (v + ', ')
         mutation = snip(mutation)
         mutation += ' );'
-        print('DEBUG final insert record string: ', mutation)
         cursor.execute(mutation)
         mycon.commit()
         return True
@@ -125,7 +124,6 @@ def count(tbl):
     query = 'select count(*) from {0};'.format(tbl)
     cursor.execute(query)
     data = cursor.fetchall()[0]
-    #print('DEBUG count:',data)
     return int(data[0])
 
 #
@@ -176,8 +174,6 @@ def get_record_raw(tbl, condition):
     query = 'select * from {} where {}'.format(tbl, condition)
     cursor.execute(query)
     data = cursor.fetchone()
-    print('DEBUG: data', data)
-    print('DEBUG: schema', schema(tbl))
     return dict(zip(schema(tbl), data))
 
 def get_password(tbl, uname):
@@ -185,7 +181,6 @@ def get_password(tbl, uname):
     returns None if no such record exists in the table 'tbl'
     """
     query = 'select passwd from {0} where uname = "{1}"'.format(tbl, uname)
-#    print('DEBUG:',query)
     cursor.execute(query)
     data = cursor.fetchone()
     return data[0]
@@ -233,13 +228,10 @@ def init_tbl(tbl_name, fields, primary=None):
     try:
         mutation = 'create table {} ( '.format(tbl_name)
         for field in fields: mutation += field + ', '
-        print('DEBUG: after appending fields: ', mutation)
         if primary != None: mutation += ' primary key({})'.format(primary)+', '
         mutation = snip(mutation)
-        print('DEBUG: after primary and snipping: ', mutation)
         mutation += ' );'
 
-        print('DEBUG: final: ', mutation)
         cursor.execute(mutation)
         mycon.commit()
         print("Success: Created new table {}".format(tbl_name))
