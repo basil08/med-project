@@ -16,4 +16,4 @@
 
 ~~7. Use env var for password email, password database, user_info_tbl name and doctor_info_tbl name~~
 
-8. 
+8. More export menuitems to a menu of its own. (export_to_bin and export_to_csv) 
