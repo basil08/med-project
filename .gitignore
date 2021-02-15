@@ -14,6 +14,9 @@
 etc/
 pg.py
 
+# dont track documentation .docx
+*.docx
+
 # pycache
 __pycache__/*
 

@@ -20,9 +20,12 @@ moods = ['happy', 'sad', 'disappointed', 'depressed',
          'angry', 'excited', 'shocked', 'delighted']
 
 def export_to_csv(record):
-    """ Writes the contents of the table 'uname' where uname is supplied by the record to a CSV file in the same directory.
-    returns: nothing
+    """
+    writes the contents of the table 'uname' where uname is supplied by the record to a CSV file in the same directory.
     reports success/failure to stdout
+
+    @param record {dict} the patient record
+    @return None
     """
     csvfilename = record['fname']+'_'+record['lname']+'.csv'
     try:
@@ -57,9 +60,12 @@ def export_to_csv(record):
         input('Press Enter Key to Continue......')
 
 def export_to_bin(record):
-    """ Writes the contents of the table 'uname' where uname is supplied bu the record to a DAT file in the same directory.
-    returns: nothing
+    """
+    writes the contents of the table 'uname' where uname is supplied bu the record to a DAT file in the same directory.
     reports succss/failure to stdout
+
+    @param record {dict}
+    @returns None
     """
     try:
         # write the headers
@@ -90,9 +96,12 @@ def export_to_bin(record):
         input('Press Enter Key to Continue.........')
 
 def basic_info(record):
-    """ puts basic info to stdout in tabular format
+    """
+    puts basic info to stdout in tabular format
     basic info means data in 'user_info' tbl
-    returns: nothing
+
+    @param record {dict}
+    @returns None
     """
     print("---------------------------")
     print("GENERAL INFORMATION FOR ", record['fname'], record['lname'])
@@ -107,10 +116,13 @@ def basic_info(record):
     input('Return to continue.....')
 
 def body_data(record):
-    """ puts body data to stdout in tabular format
+    """
+    puts body data to stdout in tabular format
     body data is in a tbl for each user. 
     that table is read entirely.
-    returns: nothing
+
+    @param record {dict}
+    @returns None
     """
     try:
         # write the headers
@@ -135,6 +147,7 @@ def body_data(record):
         input("Press Return Key to Continue......")
 
         return db.insert_user_data(record, mutation)
+
 #
 # NOTIFICATION MODULE
 #
@@ -143,7 +156,9 @@ def read_notifs(record):
     Straight-forward, try to open the user's notifs text file and read all notifications.
     If File doesn't exist, then doctor assigned has not notified even once.
     Delete the <uname>_notifs.txt file to reset notifs for this user.
-    returns: nothing
+
+    @param record {dict}
+    @returns None
     """
     try:
         f = open('.{}_notifs.txt'.format(record['fname']), 'r')
@@ -159,7 +174,9 @@ def send_notifs(record):
     Get this patients doctor record from db, then fetch that doctors email.
     Input msg and try to send an email and write to <doctor>_notifs.txt
     Handle exceptions related to email here
-    returns: nothing
+
+    @param record {dict}
+    @returns None
     """
     try:
         doctor = record['doctor']
@@ -194,13 +211,16 @@ def send_notifs(record):
         print('Error: Cannot send notification to {}'.format(doctor))
     finally:
         input("Press Enter to continue....")
-#
 # END NOTIFICATION MODULE
 
 # SOS MODULE
 #
 def config_sos(record):
-    """ Sets/Updates the Emergency SOS Broadcast message
+    """
+    sets/updates the Emergency SOS Broadcast message
+
+    @param record {dict}
+    @returns None
     """
     try:
         f = open('.{}_sos.txt'.format(record['fname']), 'w')
@@ -219,7 +239,10 @@ def config_sos(record):
 
 def broadcast_sos(record):
     """
-    Email and notify _every_ doctor in the doctor database about this patient
+    email and notify _every_ doctor in the doctor database about this patient
+    
+    @param record {string}
+    @returns None
     """
     try:
         # get the list of doctors from the database

@@ -16,9 +16,15 @@ import util
 import db
 import os
 
+# Load doctor info table from env variables
 DOCTOR_INFO_TBL = os.getenv("DOCTOR_INFO_TBL")
 
 def unauthorized_access():
+    """
+    Simply message to stdout
+    @params None
+    @returns None
+    """
     print('Unauthorized access: Incorrect Password')
     print('*'*20,' ABORT ','*'*20)
 
@@ -55,6 +61,12 @@ def new_signup():
     initialize()
 
 def signup():
+    """
+    A simple menu to ask signup or not. Directs to new_signup()
+
+    @params None
+    @returns None
+    """
     util.cls()
     print('-----------')
     print('You did not enter a username and password during login\nDo you want to create an account?(y/N)')
@@ -66,6 +78,12 @@ def signup():
         new_signup()
 
 def login():
+    """
+    Login logic for user subsystem
+
+    @params None
+    @returns None
+    """
     try:
         # clear current buffer
         util.cls()
@@ -93,9 +111,21 @@ def login():
         pass            # for now
 
 def show_submenu(menu):
+    """
+    Helper function for consolemenu to implement sub-menu screens
+
+    @params None
+    @returns None
+    """
     menu.show()
 
 def initialize():
+    """
+    Construct the consolemenu
+
+    @params None
+    @returns None
+    """
     record = login()
     if record == None: # shouldn't be needed, but a security check
         pass

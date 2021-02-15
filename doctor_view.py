@@ -9,10 +9,13 @@ USER_INFO_TBL = os.getenv("USER_INFO_TBL")
 
 def send_notifs(record):
     """
-    Read <doctor>_patients.txt file and ask who to send notification to...
+    read <doctor>_patients.txt file and ask who to send notification to...
     (If that file does not exist, exit with grace as noone has this doc assigned)
     Read the msg, write to <patient>_notifs.txt (create if doesn't exist)
     and try to send email to that id
+
+    @param record {dict}
+    @returns None
     """
     patients = get_patients(record)
     try:
@@ -48,7 +51,10 @@ def send_notifs(record):
 
 def get_patients(record):
     """
-    Read the doctors patients file and return a list of the patient's fname
+    read the doctors patients file and return a list of the patient's fname
+
+    @param record {dict}
+    @returns lst {list} list of patients this doctor is assigned to
     """
     lst = []
     try:
@@ -59,6 +65,13 @@ def get_patients(record):
     finally: return lst
 
 def read_notifs(record):
+    """
+    try to read this doctor's notifs.txt file.
+    Handles non-existent file case.
+
+    @param record {dict}
+    @returns None
+    """
     try:
         f = open('.{}_notifs.txt'.format(record['fname']), 'r')
         print(f.read())

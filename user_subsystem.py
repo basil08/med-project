@@ -15,13 +15,26 @@ import user_view
 import util
 import db
 
+# Load user info table from env variables
 USER_INFO_TBL = os.getenv("USER_INFO_TBL")
 
 def unauthorized_access():
+    """
+    Simply message to stdout
+    @params None
+    @returns None
+    """
     print('Unauthorized access: Incorrect Password')
     print('*'*20,' ABORT ','*'*20)
 
 def choose_doctor(tbl_name):
+    """
+    Get the list of doctors available.
+    Queries the doctor info table for doctor first name and speciality.
+
+    @param tbl_name {string} the doctor table name
+    @returns doctor_fname {string} fname of doctor chosen by user by index
+    """
     try:
         doctors = db.get_list(tbl_name, 'fname')
         specialities = db.get_list(tbl_name, 'speciality')
@@ -36,6 +49,9 @@ def new_signup():
     """ Self-explanatory
     Inserts a new valid record in the USER_INFO_TBL
     Checks uname is unique and verifies password by retyping
+    
+    @params None
+    @returns None
     """
     fname = input('Enter your first name: ').strip()
     lname = input('Enter your last name: ').strip()
@@ -50,6 +66,7 @@ def new_signup():
         print('[-] Username taken: Try Again')
         uname = input('Enter your username: ')
 
+    # get the password securely
     password = getpass.getpass(prompt='Create a strong password: ')
     retype_password = getpass.getpass(prompt='Retype password: ')
     
@@ -57,9 +74,11 @@ def new_signup():
         print('Passwords do not match\nAbort')
         sys.exit()
     
-    new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password, 'id': str(random.randint(1,100000)), \
-        'addr':addr,'phone':phone,'email':email, 'doctor': doctor}
+    new_user = {'uname':uname, 'fname':fname, 'lname':lname, 'passwd':password,\
+            'id': str(random.randint(1,100000)), 'addr':addr, \
+            'phone':phone,'email':email, 'doctor': doctor}
 
+    # write this patient to the assigned doctor's patient list
     try:
         f = open('.{}_patients.txt'.format(doctor), 'a')
     except FileNotFoundError as err:
@@ -92,6 +111,12 @@ def new_signup():
     initialize()
 
 def signup():
+    """
+    A simple menu to ask signup or not. Directs to new_signup()
+
+    @params None
+    @returns None
+    """
     util.cls()
     print('-----------')
     print('You did not enter a username and password during login\nDo you want to create an account?(y/N)')
@@ -103,15 +128,21 @@ def signup():
         new_signup()
 
 def login():
+    """
+    Login logic for user subsystem
+
+    @params None
+    @returns None
+    """
     try:
         # clear current buffer
         util.cls()
         print("=========================")
-        print("\tMed\t")
-        print("=========================")
+        print("\tMED\t")
         print("=========================")
         print("Welcome to user authentication portal")
         print("=========================")
+        print("(If you are a new user, hit return twice to enter new login portal)")
         name = input('Username> ').strip()
         password = getpass.getpass(prompt='Password:\n??? ')
         
@@ -133,9 +164,21 @@ def login():
         pass            # for now
 
 def show_submenu(menu):
+    """
+    Helper function for consolemenu to implement sub-menu screens
+
+    @params None
+    @returns None
+    """
     menu.show()
 
 def initialize():
+    """
+    Construct the consolemenu
+
+    @params None
+    @returns None
+    """
     record = login()
     if record == None: # shouldn't be needed, but a security check
         pass

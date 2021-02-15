@@ -1,4 +1,5 @@
-
+# user defined Error
+# stubs for now
 class NoSuchTableError(Exception):
     pass
 

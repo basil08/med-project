@@ -14,8 +14,13 @@ from email import encoders
 
 def send(toaddr, subject, body):
     """
-    Send an email with subject and body to toaddr. 
+    send an email with subject and body to toaddr. 
     TODO: Sender id can be configured from admin panel
+
+    @param toaddr {string} sender's email id
+    @param subject {string}
+    @param body {string}
+    @returns None
     """
     # instance of MIMEMultipart 
     msg = MIMEMultipart() 
