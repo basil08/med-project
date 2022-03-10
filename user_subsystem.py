@@ -65,7 +65,7 @@ def new_signup():
     while db.has(USER_INFO_TBL,'uname',uname):
         print('[-] Username taken: Try Again')
         uname = input('Enter your username: ')
-
+        
     # get the password securely
     password = getpass.getpass(prompt='Create a strong password: ')
     retype_password = getpass.getpass(prompt='Retype password: ')
@@ -132,7 +132,7 @@ def login():
     Login logic for user subsystem
 
     @params None
-    @returns None
+    @returns record {dict} the authorized patient
     """
     try:
         # clear current buffer
@@ -142,7 +142,7 @@ def login():
         print("=========================")
         print("Welcome to user authentication portal")
         print("=========================")
-        print("(If you are a new user, hit return twice to enter new login portal)")
+        print("(If you are a new user, hit return twice to enter new signup portal)")
         name = input('Username> ').strip()
         password = getpass.getpass(prompt='Password:\n??? ')
         
@@ -197,8 +197,6 @@ def initialize():
 
         appointment_menu = ConsoleMenu("Appointments", "Everything related to appointments in one place.")
         apppointment_item = FunctionItem("Appointments", show_submenu, [appointment_menu])
-        appointment_menu.append_item(FunctionItem("Fix an Appointment", user_view.fix_appointment, [record]))
-        appointment_menu.append_item(FunctionItem("My Appointments", user_view.read_appointments, [record]))
 
         notifications_item = FunctionItem("Notifications", show_submenu, [notifications_menu])
         notifications_menu.append_item(FunctionItem("Read Recent Notifications", user_view.read_notifs, [record]))

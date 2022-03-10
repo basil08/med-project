@@ -82,14 +82,17 @@ def login():
     Login logic for user subsystem
 
     @params None
-    @returns None
+    @returns record {dict} the authrorized doctor
     """
     try:
         # clear current buffer
         util.cls()
         print("=========================")
+        print("\tMED\t")
+        print("=========================")
         print("Welcome to doctor authentication portal")
         print("=========================")
+        print("(If you are a new doctor, hit return twice to enter new signup portal)")
         name = input('Username> ').strip()
         password = getpass.getpass(prompt='Password ??? ')
         

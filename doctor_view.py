@@ -29,7 +29,7 @@ def send_notifs(record):
         patient_email_id = db.get_list(USER_INFO_TBL, 'email', 'fname = "{}"'.format(patient))[0]
         # open file stream
         try:
-            f = open('.{}_notifs.txt'.format(patient), 'a+')
+            f = open('.{}_notifs.txt'.format(patient), 'w+')
             msg = '\n\n'
             msg += ('Timestamp: ' + datetime.datetime.now().ctime() + '\n')
             msg += ('Message: '+ raw_msg + '\n')
